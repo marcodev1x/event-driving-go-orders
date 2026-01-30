@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ad9c79f2-588a-45be-b392-81308665c4d1" name="Changes" comment="feat: added first instance with gin + gorm, preparing architeture...">
+      <change afterPath="$PROJECT_DIR$/services/order-service/internal/usecases/checkout.usecases.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/.air.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/go.mod" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/go.sum" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/infra/bootstrap.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/infra/config/env.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/infra/config/logger.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/infra/config/structs.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/infra/database.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/domain/checkout.entity.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/helpers.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/http.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/middlewares/middlewares.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/redis.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/repository/mysql/checkout.repository.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/rest/checkout-consumer.rest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/rest/checkout.rest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/rest/routes.rest.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/routes.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/structs/urls.structs.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/usecases/payment.usecases.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/internal/usecases/redis.usecases.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/kafka/consumer.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/kafka/events/domain/events.domain.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/kafka/producer.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/main.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/payment-service/setup/setup-routes.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.air.toml" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/.air.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra/bootstrap.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/infra/bootstrap.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra/config/env.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/infra/config/env.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra/config/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/infra/config/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra/config/structs.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/infra/config/structs.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra/database.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/infra/database.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/domain/urls.entity.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/domain/checkout.entity.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/helpers.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/helpers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/helpers/users.helpers.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/http.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/middlewares/middlewares.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/middlewares/middlewares.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/redis.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/repository/mysql/urls.repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/repository/mysql/checkout.repository.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/rest/routes.rest.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/rest/routes.rest.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/rest/urls.rest.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/rest/checkout.rest.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/routes.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/structs/urls.structs.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/structs/urls.structs.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/usecases/mocks/mock_redis_repository.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/usecases/mocks/mock_url_repository.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/usecases/redis.usecases.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/usecases/redis.usecases.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/usecases/tests/urls.usecases_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/usecases/urls.usecases.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup/setup-routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/setup/setup-routes.go" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="4" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file:///usr/lib/go-1.24" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="SYNC" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="38QrFvPBWsq7lTDoYwfPHw7Oatl" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.GoLinterPluginOnboardingV2": "true",
+    "RunOnceActivity.GoLinterPluginStorageMigration": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "augment.onboarding.workspace.first.indexed./home/marco/GolandProjects/awesomeProject": "true",
+    "augment.onboarding.workspace.first.indexed./home/marco/GolandProjects/go-project": "true",
+    "augment.onboarding.workspace.summary.shown.33dbea3d9502ed4f3a8975fd204ffd0eec7ca7477c8748b3a7bf0a9f7e8e6a7d": "true",
+    "augment.onboarding.workspace.summary.shown.b094f4808bed7d5da15e0144a3e2412da6eade84751ce9b2df9178f32bb23587": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/marco/Área de trabalho/event-driving-go-orders/services",
+    "onboarding.tips.debug.path": "/home/marco/GolandProjects/awesomeProject/main.go",
+    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.General",
+    "to.speed.mode.migration.done": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/services" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/services/order-service/kafka/consumers" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/services/order-service" />
+      <recent name="$PROJECT_DIR$/services" />
+      <recent name="$PROJECT_DIR$/internal/usecases/tests" />
+    </key>
+  </component>
+  <component name="RedisHelper">
+    <option name="connections">
+      <list>
+        <ConnectionInfo>
+          <option name="global" value="false" />
+          <option name="id" value="885d7f7d-ae17-4341-8f24-c50bb975a5e3" />
+          <option name="name" value="redis-local" />
+          <option name="port" value="6379" />
+          <option name="url" value="localhost" />
+          <option name="user" value="redis" />
+        </ConnectionInfo>
+      </list>
+    </option>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-gosdk-72a9cf600ed8-dfa3e7267ae0-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-253.29346.379" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ad9c79f2-588a-45be-b392-81308665c4d1" name="Changes" comment="" />
+      <created>1768742535541</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1768742535541</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat: added first instance with gin + gorm, preparing architeture..." />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: added first instance with gin + gorm, preparing architeture..." />
+  </component>
+</project>

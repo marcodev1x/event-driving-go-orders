@@ -1,0 +1,133 @@
+services:
+
+  mysql:
+    image: mysql:latest
+    container_name: orders-mysql
+    environment:
+      MYSQL_DATABASE: orders
+      MYSQL_USER: orders
+      MYSQL_ROOT_PASSWORD: orders123
+      MYSQL_PASSWORD: orders123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [
+        "CMD-SHELL",
+        "mysqladmin ping -h localhost -uroot -p$MYSQL_ROOT_PASSWORD || exit 1"
+      ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    networks:
+      - orders-net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: orders-kafka
+    hostname: kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk #Id de cluster gerado pelo kafka
+
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "cub kafka-ready -b kafka:9092 1 20 || exit 1"
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    networks:
+      - orders-net
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: orders-kafka-ui
+    ports:
+      - "8081:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: orders
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - orders-net
+
+  redis:
+    image: redis:8.2
+    container_name: orders-redis
+    ports:
+      - "6380:6379"
+    networks:
+      - orders-net
+
+  order-service:
+    build: ./services/order-service
+    container_name: order-service
+    depends_on:
+      mysql:
+          condition: service_healthy
+      kafka:
+          condition: service_healthy
+      redis:
+          condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_USER: orders
+      DATABASE_PASSWORD: orders123
+      DATABASE_NAME: orders
+      REDIS_ADDR_URL: redis:6379
+
+      KAFKA_BROKER: kafka:9092
+    networks:
+      - orders-net
+
+  payment-service:
+    build: ./services/payment-service
+    container_name: payment-service
+    depends_on:
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "8082:8082"
+    environment:
+      REDIS_ADDR_URL: redis:6379
+
+      KAFKA_BROKER: kafka:9092
+    networks:
+      - orders-net
+
+volumes:
+  mysql_data:
+
+networks:
+  orders-net:
+    driver: bridge
