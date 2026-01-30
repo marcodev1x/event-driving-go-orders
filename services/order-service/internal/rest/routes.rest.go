@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"order-service/infra"
 	"order-service/infra/config"
 	"order-service/internal"
@@ -8,40 +9,49 @@ import (
 	"order-service/internal/repository/mysql"
 	"order-service/internal/usecases"
 	"order-service/kafka"
+	"time"
 
+	"github.com/cenkalti/backoff/v4"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func CheckoutRoutes(env *config.Env) *[]internal.RouteHandler {
 	producer := kafka.NewProducer(env.KafkaConfig.Broker, "orders-events")
 
-	consumerHandler := NewCheckoutConsumer()
-	_ = kafka.NewConsumer(env.KafkaConfig.Broker, "orders-events", "orders-workers", consumerHandler)
+	checkoutUseCase := usecases.NewCheckoutUseCase(
+		mysql.NewCheckoutRepository(infra.DomainDatabase),
+		usecases.NewRedisUsecase(),
+		producer,
+	)
 
-	/*go func() {
-		for i := 0; i <= 5; i++ {
-			config.Logger().Info("Tentando iniciar Kafka consumer...")
+	bf := backoff.NewExponentialBackOff()
+	bf.MaxElapsedTime = 60 * time.Second
+	bf.MaxInterval = 5 * time.Second
 
-			err := consumer.Start(context.Background())
-			if err != nil {
-				config.Logger().Error("Erro ao iniciar consumer, retry em 5s", err)
-				time.Sleep(5 * time.Second)
+	go func() {
+		config.Logger().Info("Starting Kafka consumer...")
 
-				if i == 5 {
-					panic("Erro ao iniciar consumer")
-				}
+		operation := func() error {
+			consumer := kafka.NewConsumer(
+				env.KafkaConfig.Broker,
+				"payment-events",
+				"order-payment-handler",
+				NewCheckoutConsumer(),
+			)
 
-				continue
-			}
-
-			break
+			return consumer.Start(context.Background())
 		}
-	}()*/
 
-	rest := NewCheckoutRest(
-		usecases.NewCheckoutUseCase(mysql.NewCheckoutRepository(infra.DomainDatabase),
-			usecases.NewRedisUsecase(),
-			producer))
+		if err := backoff.Retry(operation, bf); err != nil {
+			config.Logger().Fatal(
+				"Kafka consumer failed after retries",
+				zap.Error(err),
+			)
+		}
+	}()
+
+	rest := NewCheckoutRest(checkoutUseCase)
 
 	return &[]internal.RouteHandler{
 		{

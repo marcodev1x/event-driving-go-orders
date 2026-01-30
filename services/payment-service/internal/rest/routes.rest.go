@@ -13,7 +13,7 @@ import (
 )
 
 func CheckoutRoutes(env *config.Env) *[]internal.RouteHandler {
-	producer := kafka.NewProducer(env.KafkaConfig.Broker, "orders-events")
+	producer := kafka.NewProducer(env.KafkaConfig.Broker, "payment-events")
 
 	bf := backoff.NewExponentialBackOff()
 	bf.MaxElapsedTime = 60 * time.Second
@@ -27,7 +27,7 @@ func CheckoutRoutes(env *config.Env) *[]internal.RouteHandler {
 				env.KafkaConfig.Broker,
 				"orders-events",
 				"orders-workers",
-				NewCheckoutConsumer(),
+				NewCheckoutConsumer(usecases.NewPaymentUseCase(usecases.NewRedisUsecase(), producer)),
 			)
 
 			return consumer.Start(context.Background())
@@ -38,7 +38,7 @@ func CheckoutRoutes(env *config.Env) *[]internal.RouteHandler {
 		}
 	}()
 
-	usecases.NewPaymentUseCase(usecases.NewRedisUsecase(), producer)
+	// usecases.NewPaymentUseCase(usecases.NewRedisUsecase(), producer)
 
 	return &[]internal.RouteHandler{}
 }

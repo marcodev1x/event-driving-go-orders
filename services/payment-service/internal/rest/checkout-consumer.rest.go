@@ -4,16 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"payment-service/infra/config"
+	"payment-service/internal/usecases"
 	events "payment-service/kafka/events/domain"
 )
 
-// CheckoutConsumer implementa a interface kafka.EventHandler
 type CheckoutConsumer struct {
-	// adicionar dependências como repository, usecase, etc.
+	usecase *usecases.PaymentUsecase
 }
 
-func NewCheckoutConsumer() *CheckoutConsumer {
-	return &CheckoutConsumer{}
+func NewCheckoutConsumer(usecases *usecases.PaymentUsecase) *CheckoutConsumer {
+	return &CheckoutConsumer{
+		usecase: usecases,
+	}
 }
 
 func (c *CheckoutConsumer) Handle(ctx context.Context, message []byte) error {
@@ -41,7 +43,11 @@ func (c *CheckoutConsumer) handleOrderCreated(ctx context.Context, event events.
 		"status", event.Checkout.Status,
 	)
 
-	// TODO: Lógica bonus? Adicionar alguma coisa? Evento retorno de order.approved?
+	err := c.usecase.ValidatePayment(event, event.ContentID)
+
+	if err != nil {
+		config.Logger().Errorw("Erro ao validar evento", "event_id", event.EventID)
+	}
 
 	return nil
 }

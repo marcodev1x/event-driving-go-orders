@@ -16,3 +16,7 @@ type OrderCreated struct {
 	BaseEvent
 	Checkout domain.Checkout `json:"checkout"`
 }
+type PaymentInvoice struct {
+	BaseEvent
+	OrderID int `json:"order_id"`
+}
