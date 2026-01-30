@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad9c79f2-588a-45be-b392-81308665c4d1" name="Changes" comment="feat: added first instance with gin + gorm, preparing architeture...">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/order-service/internal/rest/checkout-consumer.rest.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/rest/checkout-consumer.rest.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/order-service/internal/rest/routes.rest.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/order-service/internal/rest/routes.rest.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/payment-service/internal/rest/checkout-consumer.rest.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment-service/internal/rest/checkout-consumer.rest.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/payment-service/internal/rest/routes.rest.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment-service/internal/rest/routes.rest.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/payment-service/internal/usecases/payment.usecases.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment-service/internal/usecases/payment.usecases.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/payment-service/kafka/events/domain/events.domain.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment-service/kafka/events/domain/events.domain.go" afterDir="false" />
-    </list>
+    <list default="true" id="ad9c79f2-588a-45be-b392-81308665c4d1" name="Changes" comment="feat: added first instance with gin + gorm, preparing architeture..." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
