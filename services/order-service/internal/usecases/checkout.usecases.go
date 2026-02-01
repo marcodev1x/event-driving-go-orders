@@ -5,10 +5,11 @@ import (
 	"order-service/infra/config"
 	"order-service/internal"
 	"order-service/internal/domain"
-	"order-service/internal/repository/mysql"
+	kafkainterfaces "order-service/internal/interfaces/kafka"
+	interfaces "order-service/internal/repository/mysql/interfaces"
 	"order-service/internal/structs"
-	"order-service/kafka"
-	"order-service/kafka/events/domain"
+	redisinterfaces "order-service/internal/usecases/interfaces"
+	events "order-service/kafka/events/domain"
 
 	"time"
 
@@ -16,18 +17,13 @@ import (
 	"github.com/google/uuid"
 )
 
-type Cache interface {
-	Get(key string) (string, error)
-	Set(key string, value string, ttl time.Duration) error
-}
-
 type CheckoutUsecase struct {
-	repository mysql.CheckoutImplementation
-	cache      Cache
-	producer   *kafka.Producer
+	repository interfaces.CheckoutImplementation
+	cache      redisinterfaces.RedisImplementation
+	producer   kafkainterfaces.EventProducer
 }
 
-func NewCheckoutUseCase(repo mysql.CheckoutImplementation, cache Cache, producer *kafka.Producer) *CheckoutUsecase {
+func NewCheckoutUseCase(repo interfaces.CheckoutImplementation, cache redisinterfaces.RedisImplementation, producer kafkainterfaces.EventProducer) *CheckoutUsecase {
 	return &CheckoutUsecase{
 		repository: repo,
 		cache:      cache,
