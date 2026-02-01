@@ -9,11 +9,16 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
+type EventProducer interface {
+	PublishEvent(ctx context.Context, key string, event interface{}) error
+	Close() error
+}
+
 type Producer struct {
 	writer *kafka.Writer
 }
 
-func NewProducer(brokers []string, topic string) *Producer {
+func NewProducer(brokers []string, topic string) EventProducer {
 	return &Producer{
 		writer: &kafka.Writer{
 			Addr:         kafka.TCP(brokers...),

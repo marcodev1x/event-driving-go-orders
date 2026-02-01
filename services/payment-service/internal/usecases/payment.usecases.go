@@ -15,13 +15,17 @@ type Cache interface {
 	Set(key string, value string, ttl time.Duration) error
 }
 
+type PaymentImplementation interface {
+	ValidatePayment(params events.OrderCreated, orderId int) error
+}
+
 type PaymentUsecase struct {
 	// repository mysql.CheckoutImplementation
 	cache    Cache
-	producer *kafka.Producer
+	producer kafka.EventProducer
 }
 
-func NewPaymentUseCase(cache Cache, producer *kafka.Producer) *PaymentUsecase {
+func NewPaymentUseCase(cache Cache, producer kafka.EventProducer) PaymentImplementation {
 	return &PaymentUsecase{
 		cache:    cache,
 		producer: producer,
@@ -52,7 +56,7 @@ func (u *PaymentUsecase) ValidatePayment(params events.OrderCreated, orderId int
 		}
 
 		if err := backoff.Retry(operationValid, bf); err != nil {
-			return internal.NewAPIError("Erro ao enviar evento mesmo após diversas tentativas. "+err.Error(), 500, 200)
+			return internal.NewAPIError("Erro ao enviar evento mesmo após diversas tentativas.", 500, 200)
 		}
 	}
 
@@ -64,7 +68,7 @@ func (u *PaymentUsecase) ValidatePayment(params events.OrderCreated, orderId int
 		}
 
 		if err := backoff.Retry(operationFailed, bf); err != nil {
-			return internal.NewAPIError("Erro ao enviar evento mesmo após diversas tentativas. "+err.Error(), 500, 200)
+			return internal.NewAPIError("Erro ao enviar evento mesmo após diversas tentativas.", 500, 200)
 		}
 	}
 

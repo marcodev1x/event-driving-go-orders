@@ -9,10 +9,10 @@ import (
 )
 
 type CheckoutConsumer struct {
-	usecase *usecases.PaymentUsecase
+	usecase usecases.PaymentImplementation
 }
 
-func NewCheckoutConsumer(usecases *usecases.PaymentUsecase) *CheckoutConsumer {
+func NewCheckoutConsumer(usecases usecases.PaymentImplementation) *CheckoutConsumer {
 	return &CheckoutConsumer{
 		usecase: usecases,
 	}
