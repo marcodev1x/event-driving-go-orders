@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"errors"
 	"order-service/internal"
 	"order-service/internal/domain"
 	repomocks "order-service/internal/repository/mocks"
@@ -15,6 +16,11 @@ import (
 )
 
 func TestCheckoutUseCases_CreateCheckout(t *testing.T) {
+
+	mockedPadronized := &structs.CreateCheckout{
+		Price:         100,
+		PaymentMethod: domain.Pix,
+	}
 
 	structErrCases := []struct {
 		testcase    string
@@ -71,4 +77,26 @@ func TestCheckoutUseCases_CreateCheckout(t *testing.T) {
 			assert.Contains(t, err.Error(), test.validateMsg)
 		})
 	}
+
+	t.Run("should throw ApiError if validate in structure fails", func(t *testing.T) {
+		controller := gomock.NewController(t)
+		defer controller.Finish()
+
+		mockRepo := repomocks.NewMockCheckoutImplementation(controller)
+		mockRedis := mocks.NewMockRedisImplementation(controller)
+		mockProducer := mockkafka.NewMockEventProducer(controller)
+		svc := usecases.NewCheckoutUseCase(mockRepo, mockRedis, mockProducer)
+
+		mockRepo.
+			EXPECT().
+			CreateCheckout(gomock.Any()).
+			Return(nil, errors.New("error")).
+			Times(1)
+
+		_, err := svc.CreateCheckout(*mockedPadronized)
+
+		expectedError := internal.NewAPIError("Erro ao criar checkout.", 500, 102)
+
+		assert.Equal(t, expectedError, err)
+	})
 }
