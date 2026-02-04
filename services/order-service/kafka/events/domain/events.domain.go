@@ -14,5 +14,7 @@ type BaseEvent struct {
 
 type OrderCreated struct {
 	BaseEvent
-	Checkout domain.Checkout `json:"checkout"`
+	Checkout   domain.Checkout `json:"checkout"`
+	BuyerEmail string          `json:"buyer_email"`
+	Name       string          `json:"name"`
 }

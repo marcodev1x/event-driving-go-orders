@@ -23,6 +23,8 @@ type PaymentInvoice struct {
 
 type NotificationInvoice struct {
 	BaseEvent
-	Status  domain.Status `json:"status"`
-	OrderID int           `json:"order_id"`
+	Status     domain.Status `json:"status"`
+	OrderID    int           `json:"order_id"`
+	BuyerEmail string        `json:"buyer_email"`
+	Name       string        `json:"name"`
 }

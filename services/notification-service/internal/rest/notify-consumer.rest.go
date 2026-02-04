@@ -32,16 +32,22 @@ func (n *NotifyConsumer) Handle(ctx context.Context, message []byte) error {
 
 	switch event.EventType {
 	case "payment.confirmed":
-		return n.handleOrderCreated(ctx, event)
+		return n.handlePayment(ctx, event)
 	default:
 		config.Logger().Warnw("Tipo de evento desconhecido", "event_type", event.EventType)
 		return nil
 	}
 }
 
-func (n *NotifyConsumer) handleOrderCreated(ctx context.Context, event events.NotificationInvoice) error {
+func (n *NotifyConsumer) handlePayment(ctx context.Context, event events.NotificationInvoice) error {
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
+	defer func() {
+		if err := recover(); err != nil {
+			config.Logger().Errorw("Erro ao processar evento", "event_id", event.EventID, "error", err)
+		}
+	}()
+
 	envs := infra.Envs
 
 	config.Logger().Infow("Processando evento de pedido criado",
@@ -51,7 +57,13 @@ func (n *NotifyConsumer) handleOrderCreated(ctx context.Context, event events.No
 		"status", event.Status,
 	)
 
-	err := n.usecase.SendNotificationEmail(event, event.ContentID, envs)
+	err := n.usecase.SendNotificationEmail(event, event.ContentID, envs, event.BuyerEmail)
+
+	config.Logger().Infow("Email enviado",
+		"event_id", event.EventID,
+		"checkout_id", event.OrderID,
+		"err", err,
+	)
 
 	if err != nil {
 		config.Logger().Errorw("Erro ao validar evento", "event_id", event.EventID)

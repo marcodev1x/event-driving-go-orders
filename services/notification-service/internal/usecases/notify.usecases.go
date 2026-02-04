@@ -1,9 +1,10 @@
 package usecases
 
 import (
-	"fmt"
 	"notification-service/infra/config"
 	"notification-service/internal"
+	"notification-service/internal/domain"
+	"notification-service/internal/templates/payment"
 	"notification-service/internal/usecases/interfaces"
 	"notification-service/kafka"
 	events "notification-service/kafka/events/domain"
@@ -28,26 +29,37 @@ func NewNotifyUseCase(cache Cache, producer *kafka.Producer) interfaces.NotifyIm
 	}
 }
 
-func (u *NotifyUsecase) SendNotificationEmail(params events.NotificationInvoice, orderId int, envs *config.Env) error {
+func (u *NotifyUsecase) SendNotificationEmail(params events.NotificationInvoice, orderId int, envs *config.Env, email string) error {
+	subject := "Pagamento confirmado"
 
-	fmt.Println(params, orderId)
+	if params.Status == domain.Failed {
+		subject = "Pagamento falhou"
+	}
 
 	Mailer := internal.NewMailer(internal.MailerContent{
 		To: struct {
 			Email string
 		}{
-			Email: "vowehe9556@azeriom.com",
+			Email: email,
 		},
-		Subject: "Assunto do email",
-		Body:    "Corpo do email em HTML",
+		Subject: subject,
 	})
+
+	htmlParams := payment.PaymentAlert{
+		Name: params.Name,
+	}
 
 	msg := Mailer.NewMessage()
 	transport := Mailer.Dialer(envs)
+
+	if err := Mailer.SetupHtml(htmlParams, "internal/templates/payment/payment_alert.html"); err != nil {
+		config.Logger().Error("Erro ao carregar template", err)
+		return err
+	}
+
 	Mailer.MailPrepared(msg, envs)
 
 	if err := transport.DialAndSend(msg); err != nil {
-		fmt.Println(err)
 		return err
 	}
 

@@ -41,16 +41,10 @@ func (u *PaymentUsecase) ValidatePayment(params events.OrderCreated, orderId int
 			ContentID: params.ContentID,
 			Timestamp: time.Now(),
 		},
-		OrderID: orderId,
-	}
-
-	NotificationEvent := events.NotificationInvoice{
-		BaseEvent: events.BaseEvent{
-			EventID:   params.EventID,
-			ContentID: params.ContentID,
-			Timestamp: time.Now(),
-		},
-		OrderID: orderId,
+		Name:          params.Name,
+		OrderID:       orderId,
+		BuyerEmail:    params.BuyerEmail,
+		PaymentMethod: params.Checkout.PaymentMethod,
 	}
 
 	bf := backoff.NewExponentialBackOff()
@@ -61,7 +55,7 @@ func (u *PaymentUsecase) ValidatePayment(params events.OrderCreated, orderId int
 
 	if params.Checkout.Price == 100 {
 		OrderReturnEvent.EventType = "payment.confirmed"
-		NotificationEvent.Status = domain.Paid
+		OrderReturnEvent.Status = domain.Paid
 
 		err := u.publishWithRetry(OrderReturnEvent)
 
@@ -72,7 +66,7 @@ func (u *PaymentUsecase) ValidatePayment(params events.OrderCreated, orderId int
 
 	if params.Checkout.Price == 50 {
 		OrderReturnEvent.EventType = "payment.failed"
-		NotificationEvent.Status = domain.Failed
+		OrderReturnEvent.Status = domain.Failed
 
 		err := u.publishWithRetry(OrderReturnEvent)
 		if err != nil {

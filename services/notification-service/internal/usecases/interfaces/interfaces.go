@@ -12,5 +12,5 @@ type RedisImplementation interface {
 }
 
 type NotifyImplementation interface {
-	SendNotificationEmail(params events.NotificationInvoice, orderId int, envs *config.Env) error
+	SendNotificationEmail(params events.NotificationInvoice, orderId int, envs *config.Env, email string) error
 }

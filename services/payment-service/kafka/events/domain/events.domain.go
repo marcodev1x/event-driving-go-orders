@@ -14,15 +14,15 @@ type BaseEvent struct {
 
 type OrderCreated struct {
 	BaseEvent
-	Checkout domain.Checkout `json:"checkout"`
+	Checkout   domain.Checkout `json:"checkout"`
+	BuyerEmail string          `json:"buyer_email"`
+	Name       string          `json:"name"`
 }
 type PaymentInvoice struct {
 	BaseEvent
-	OrderID int `json:"order_id"`
-}
-
-type NotificationInvoice struct {
-	BaseEvent
-	Status  domain.Status `json:"status"`
-	OrderID int           `json:"order_id"`
+	Name          string               `json:"name"`
+	Status        domain.Status        `json:"status"`
+	OrderID       int                  `json:"order_id"`
+	BuyerEmail    string               `json:"buyer_email"`
+	PaymentMethod domain.PaymentMethod `json:"payment_method"`
 }

@@ -1,8 +1,10 @@
 package internal
 
 import (
+	"bytes"
 	"notification-service/infra/config"
 	"strconv"
+	"text/template"
 
 	"github.com/go-mail/mail/v2"
 )
@@ -11,6 +13,7 @@ type MailerImplementation interface {
 	NewMessage() *mail.Message
 	Dialer(envs *config.Env) *mail.Dialer
 	MailPrepared(msg *mail.Message, envs *config.Env)
+	SetupHtml(params interface{}, file string) error
 }
 
 type MailerContent struct {
@@ -51,4 +54,21 @@ func (m *Mailer) MailPrepared(msg *mail.Message, envs *config.Env) {
 	msg.SetHeader("To", m.content.To.Email)
 	msg.SetHeader("Subject", m.content.Subject)
 	msg.SetBody("text/html", m.content.Body)
+}
+
+func (m *Mailer) SetupHtml(params interface{}, file string) error {
+	tpl, err := template.ParseFiles(file)
+
+	if err != nil {
+		return err
+	}
+
+	var buf bytes.Buffer
+	if err := tpl.Execute(&buf, params); err != nil {
+		return err
+	}
+
+	m.content.Body = buf.String()
+
+	return nil
 }

@@ -55,7 +55,9 @@ func (u *CheckoutUsecase) CreateCheckout(req structs.CreateCheckout) (bool, erro
 			ContentID: checkout.ID,
 			Timestamp: time.Now(),
 		},
-		Checkout: *checkout,
+		Checkout:   *checkout,
+		BuyerEmail: req.BuyerEmail,
+		Name:       req.Name,
 	}
 
 	go u.publishWithRetry(event)
