@@ -10,6 +10,7 @@ type Env struct {
 	DatabaseConfig *DatabaseConfig
 	RedisConfig    *RedisConfig
 	KafkaConfig    *KafkaConfig
+	SmtpConfig     *SmtpConfig
 }
 
 func LoadEnv() *Env {
@@ -39,6 +40,14 @@ func LoadEnv() *Env {
 		},
 		KafkaConfig: &KafkaConfig{
 			Broker: []string{getEnv("KAFKA_BROKER")},
+		},
+		SmtpConfig: &SmtpConfig{
+			Host:                 getEnv("SMTP_HOST"),
+			Port:                 getEnv("SMTP_PORT"),
+			Secure:               getEnv("SMTP_SECURE") == "true",
+			EmailNoReply:         getEnv("EMAIL_NOREPLY_FROM"),
+			EmailNoReplyUser:     getEnv("EMAIL_NOREPLY_USER"),
+			EmailNoReplyPassword: getEnv("EMAIL_NOREPLY_PASSWORD"),
 		},
 	}
 }

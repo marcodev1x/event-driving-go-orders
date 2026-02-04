@@ -21,13 +21,15 @@ func CheckoutRoutes(env *config.Env) *[]internal.RouteHandler {
 
 	go func() {
 		config.Logger().Info("Starting Kafka consumer...")
+		handler := NewNotifyConsumer(usecases.NewNotifyUseCase(usecases.NewRedisUsecase(), producer))
 
 		operation := func() error {
 			consumer := kafka.NewConsumer(
 				env.KafkaConfig.Broker,
-				"orders-events",
-				"orders-workers",
-				NewCheckoutConsumer(usecases.NewPaymentUseCase(usecases.NewRedisUsecase(), producer)),
+				"payment-events",
+				"notification-workers",
+				handler,
+				10,
 			)
 
 			return consumer.Start(context.Background())
@@ -37,8 +39,6 @@ func CheckoutRoutes(env *config.Env) *[]internal.RouteHandler {
 			config.Logger().Fatal("Kafka consumer failed after retries", zap.Error(err))
 		}
 	}()
-
-	// usecases.NewPaymentUseCase(usecases.NewRedisUsecase(), producer)
 
 	return &[]internal.RouteHandler{}
 }

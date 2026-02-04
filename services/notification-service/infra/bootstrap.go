@@ -10,12 +10,18 @@ import (
 	"gorm.io/gorm"
 )
 
+var (
+	Envs *config.Env
+)
+
 type Bootstrap struct{}
 
 func (b *Bootstrap) LoadEnv() *config.Env {
 	env := config.LoadEnv()
 
 	config.Logger().Info("Environment variables loaded")
+
+	Envs = env
 
 	return env
 }

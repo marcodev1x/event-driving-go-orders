@@ -6,15 +6,22 @@ import (
 	"payment-service/infra/config"
 	"payment-service/internal/usecases"
 	events "payment-service/kafka/events/domain"
+	"sync"
 )
 
 type CheckoutConsumer struct {
 	usecase usecases.PaymentImplementation
+
+	wg sync.WaitGroup
 }
 
-func NewCheckoutConsumer(usecases usecases.PaymentImplementation) *CheckoutConsumer {
+func NewCheckoutConsumer(usecase usecases.PaymentImplementation, maxConcurrentOps int) *CheckoutConsumer {
+	if maxConcurrentOps <= 0 {
+		maxConcurrentOps = 10
+	}
+
 	return &CheckoutConsumer{
-		usecase: usecases,
+		usecase: usecase,
 	}
 }
 

@@ -125,6 +125,24 @@ services:
     networks:
       - orders-net
 
+
+  notification-service:
+      build: ./services/notification-service
+      container_name: notification-service
+      depends_on:
+        kafka:
+          condition: service_healthy
+        redis:
+          condition: service_started
+      ports:
+        - "8083:8083"
+      environment:
+        REDIS_ADDR_URL: redis:6379
+
+        KAFKA_BROKER: kafka:9092
+      networks:
+        - orders-net
+
 volumes:
   mysql_data:
 

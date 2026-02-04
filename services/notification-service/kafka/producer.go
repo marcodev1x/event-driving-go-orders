@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"notification-service/internal"
+	"sync"
 	"time"
 
 	"github.com/segmentio/kafka-go"
@@ -11,6 +12,8 @@ import (
 
 type Producer struct {
 	writer *kafka.Writer
+
+	wg sync.WaitGroup
 }
 
 func NewProducer(brokers []string, topic string) *Producer {
@@ -48,6 +51,23 @@ func (p *Producer) PublishEvent(ctx context.Context, key string, event interface
 	return nil
 }
 
+func (p *Producer) PublishEventAsync(ctx context.Context, key string, event interface{}) <-chan error {
+	errCh := make(chan error, 1)
+
+	p.wg.Add(1)
+	go func() {
+		defer p.wg.Done()
+		defer close(errCh)
+
+		err := p.PublishEvent(ctx, key, event)
+		errCh <- err
+	}()
+
+	return errCh
+}
+
 func (p *Producer) Close() error {
+	p.wg.Wait()
+
 	return p.writer.Close()
 }

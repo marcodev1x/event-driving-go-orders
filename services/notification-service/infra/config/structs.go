@@ -19,3 +19,12 @@ type KafkaConfig struct {
 	Broker []string
 	Topic  string
 }
+
+type SmtpConfig struct {
+	Host                 string
+	Port                 string
+	Secure               bool
+	EmailNoReply         string
+	EmailNoReplyUser     string
+	EmailNoReplyPassword string
+}

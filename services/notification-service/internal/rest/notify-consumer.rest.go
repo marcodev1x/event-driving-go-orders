@@ -3,23 +3,25 @@ package rest
 import (
 	"context"
 	"encoding/json"
+	"notification-service/infra"
 	"notification-service/infra/config"
-	"notification-service/internal/usecases"
+	"notification-service/internal/usecases/interfaces"
 	events "notification-service/kafka/events/domain"
+	"time"
 )
 
-type CheckoutConsumer struct {
-	usecase *usecases.PaymentUsecase
+type NotifyConsumer struct {
+	usecase interfaces.NotifyImplementation
 }
 
-func NewCheckoutConsumer(usecases *usecases.PaymentUsecase) *CheckoutConsumer {
-	return &CheckoutConsumer{
+func NewNotifyConsumer(usecases interfaces.NotifyImplementation) *NotifyConsumer {
+	return &NotifyConsumer{
 		usecase: usecases,
 	}
 }
 
-func (c *CheckoutConsumer) Handle(ctx context.Context, message []byte) error {
-	var event events.OrderCreated
+func (n *NotifyConsumer) Handle(ctx context.Context, message []byte) error {
+	var event events.NotificationInvoice
 
 	if err := json.Unmarshal(message, &event); err != nil {
 		config.Logger().Error("Erro ao deserializar evento", err)
@@ -29,23 +31,27 @@ func (c *CheckoutConsumer) Handle(ctx context.Context, message []byte) error {
 	config.Logger().Info(event)
 
 	switch event.EventType {
-	case "payment.valid":
-		return c.handleOrderCreated(ctx, event)
+	case "payment.confirmed":
+		return n.handleOrderCreated(ctx, event)
 	default:
 		config.Logger().Warnw("Tipo de evento desconhecido", "event_type", event.EventType)
 		return nil
 	}
 }
 
-func (c *CheckoutConsumer) handleOrderCreated(ctx context.Context, event events.OrderCreated) error {
+func (n *NotifyConsumer) handleOrderCreated(ctx context.Context, event events.NotificationInvoice) error {
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+	envs := infra.Envs
+
 	config.Logger().Infow("Processando evento de pedido criado",
 		"event_id", event.EventID,
-		"checkout_id", event.Checkout.ID,
-		"price", event.Checkout.Price,
-		"status", event.Checkout.Status,
+		"checkout_id", event.OrderID,
+		"stts", event.Status,
+		"status", event.Status,
 	)
 
-	err := c.usecase.ValidatePayment(event, event.ContentID)
+	err := n.usecase.SendNotificationEmail(event, event.ContentID, envs)
 
 	if err != nil {
 		config.Logger().Errorw("Erro ao validar evento", "event_id", event.EventID)

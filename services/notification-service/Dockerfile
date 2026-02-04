@@ -9,6 +9,6 @@ COPY . .
 
 EXPOSE 8080
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o payment-service .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o notification-service .
 
-CMD ["./payment-service"]
+CMD ["./notification-service"]

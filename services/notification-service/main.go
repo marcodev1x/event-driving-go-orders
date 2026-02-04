@@ -20,5 +20,5 @@ func main() {
 
 	setup.PrepareRoutes(server)
 
-	server.Run(":8082")
+	server.Run(":8083")
 }

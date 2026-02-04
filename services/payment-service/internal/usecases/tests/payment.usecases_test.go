@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"context"
 	"errors"
 	"payment-service/internal"
 	"payment-service/internal/domain"
@@ -58,7 +57,7 @@ func TestPaymentUseCases_ValidatePayment(t *testing.T) {
 
 			producerMocked.
 				EXPECT().
-				PublishEvent(context.Background(), test.key, gomock.AssignableToTypeOf(events.PaymentInvoice{})).
+				PublishEvent(gomock.Any(), test.key, gomock.AssignableToTypeOf(events.PaymentInvoice{})).
 				Return(nil).
 				Times(1)
 
@@ -92,7 +91,7 @@ func TestPaymentUseCases_ValidatePayment(t *testing.T) {
 
 			producerMocked.
 				EXPECT().
-				PublishEvent(context.Background(), gomock.Any(), gomock.AssignableToTypeOf(events.PaymentInvoice{})).
+				PublishEvent(gomock.Any(), gomock.Any(), gomock.AssignableToTypeOf(events.PaymentInvoice{})).
 				Return(errors.New("error")).
 				AnyTimes() // Valida tentativas de backoff. Demora mais por conta de retry
 
@@ -106,4 +105,5 @@ func TestPaymentUseCases_ValidatePayment(t *testing.T) {
 			assert.Equal(t, expectedError, err)
 		})
 	}
+
 }

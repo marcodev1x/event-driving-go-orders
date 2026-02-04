@@ -2,7 +2,9 @@ package usecases
 
 import (
 	"context"
+	"payment-service/infra/config"
 	"payment-service/internal"
+	"payment-service/internal/domain"
 	"payment-service/kafka"
 	events "payment-service/kafka/events/domain"
 	"time"
@@ -33,7 +35,16 @@ func NewPaymentUseCase(cache Cache, producer kafka.EventProducer) PaymentImpleme
 }
 
 func (u *PaymentUsecase) ValidatePayment(params events.OrderCreated, orderId int) error {
-	Event := events.PaymentInvoice{
+	OrderReturnEvent := events.PaymentInvoice{
+		BaseEvent: events.BaseEvent{
+			EventID:   params.EventID,
+			ContentID: params.ContentID,
+			Timestamp: time.Now(),
+		},
+		OrderID: orderId,
+	}
+
+	NotificationEvent := events.NotificationInvoice{
 		BaseEvent: events.BaseEvent{
 			EventID:   params.EventID,
 			ContentID: params.ContentID,
@@ -49,28 +60,58 @@ func (u *PaymentUsecase) ValidatePayment(params events.OrderCreated, orderId int
 	bf.Multiplier = 2
 
 	if params.Checkout.Price == 100 {
-		Event.EventType = "payment.confirmed"
+		OrderReturnEvent.EventType = "payment.confirmed"
+		NotificationEvent.Status = domain.Paid
 
-		operationValid := func() error {
-			return u.producer.PublishEvent(context.Background(), "payment.confirmed", Event)
-		}
+		err := u.publishWithRetry(OrderReturnEvent)
 
-		if err := backoff.Retry(operationValid, bf); err != nil {
-			return internal.NewAPIError("Erro ao enviar evento mesmo após diversas tentativas.", 500, 200)
+		if err != nil {
+			return err
 		}
 	}
 
 	if params.Checkout.Price == 50 {
-		Event.EventType = "payment.failed"
+		OrderReturnEvent.EventType = "payment.failed"
+		NotificationEvent.Status = domain.Failed
 
-		operationFailed := func() error {
-			return u.producer.PublishEvent(context.Background(), "payment.failed", Event)
-		}
-
-		if err := backoff.Retry(operationFailed, bf); err != nil {
-			return internal.NewAPIError("Erro ao enviar evento mesmo após diversas tentativas.", 500, 200)
+		err := u.publishWithRetry(OrderReturnEvent)
+		if err != nil {
+			return err
 		}
 	}
+
+	return nil
+}
+
+func (p *PaymentUsecase) publishWithRetry(event events.PaymentInvoice) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	operation := func() error {
+		return p.producer.PublishEvent(ctx, event.EventType, event)
+	}
+
+	retry := backoff.NewExponentialBackOff()
+	retry.InitialInterval = 1 * time.Second
+	retry.MaxInterval = 5 * time.Second
+	retry.MaxElapsedTime = 10 * time.Second
+	retry.Multiplier = 2
+
+	if err := backoff.Retry(operation, retry); err != nil {
+		config.Logger().Errorw("Falha ao publicar evento após múltiplas tentativas",
+			"error", err,
+			"event_id", event.EventID,
+			"event_type", event.EventType,
+			"checkout_id", event.OrderID,
+		)
+		return internal.NewAPIError("Erro ao enviar evento mesmo após diversas tentativas.", 500, 200)
+	}
+
+	config.Logger().Infow("Evento publicado com sucesso",
+		"event_id", event.EventID,
+		"event_type", event.EventType,
+		"checkout_id", event.OrderID,
+	)
 
 	return nil
 }

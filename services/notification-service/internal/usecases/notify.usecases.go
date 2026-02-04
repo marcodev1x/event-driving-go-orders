@@ -1,13 +1,13 @@
 package usecases
 
 import (
-	"context"
+	"fmt"
+	"notification-service/infra/config"
 	"notification-service/internal"
+	"notification-service/internal/usecases/interfaces"
 	"notification-service/kafka"
 	events "notification-service/kafka/events/domain"
 	"time"
-
-	"github.com/cenkalti/backoff/v4"
 )
 
 type Cache interface {
@@ -15,57 +15,40 @@ type Cache interface {
 	Set(key string, value string, ttl time.Duration) error
 }
 
-type PaymentUsecase struct {
+type NotifyUsecase struct {
 	// repository mysql.CheckoutImplementation
 	cache    Cache
 	producer *kafka.Producer
 }
 
-func NewPaymentUseCase(cache Cache, producer *kafka.Producer) *PaymentUsecase {
-	return &PaymentUsecase{
+func NewNotifyUseCase(cache Cache, producer *kafka.Producer) interfaces.NotifyImplementation {
+	return &NotifyUsecase{
 		cache:    cache,
 		producer: producer,
 	}
 }
 
-func (u *PaymentUsecase) ValidatePayment(params events.OrderCreated, orderId int) error {
-	Event := events.PaymentInvoice{
-		BaseEvent: events.BaseEvent{
-			EventID:   params.EventID,
-			ContentID: params.ContentID,
-			Timestamp: time.Now(),
+func (u *NotifyUsecase) SendNotificationEmail(params events.NotificationInvoice, orderId int, envs *config.Env) error {
+
+	fmt.Println(params, orderId)
+
+	Mailer := internal.NewMailer(internal.MailerContent{
+		To: struct {
+			Email string
+		}{
+			Email: "vowehe9556@azeriom.com",
 		},
-		OrderID: orderId,
-	}
+		Subject: "Assunto do email",
+		Body:    "Corpo do email em HTML",
+	})
 
-	bf := backoff.NewExponentialBackOff()
-	bf.InitialInterval = 1 * time.Second
-	bf.MaxElapsedTime = 10 * time.Second
-	bf.MaxInterval = 5 * time.Second
-	bf.Multiplier = 2
+	msg := Mailer.NewMessage()
+	transport := Mailer.Dialer(envs)
+	Mailer.MailPrepared(msg, envs)
 
-	if params.Checkout.Price == 100 {
-		Event.EventType = "payment.confirmed"
-
-		operationValid := func() error {
-			return u.producer.PublishEvent(context.Background(), "payment.confirmed", Event)
-		}
-
-		if err := backoff.Retry(operationValid, bf); err != nil {
-			return internal.NewAPIError("Erro ao enviar evento mesmo após diversas tentativas. "+err.Error(), 500, 200)
-		}
-	}
-
-	if params.Checkout.Price == 50 {
-		Event.EventType = "payment.failed"
-
-		operationFailed := func() error {
-			return u.producer.PublishEvent(context.Background(), "payment.failed", Event)
-		}
-
-		if err := backoff.Retry(operationFailed, bf); err != nil {
-			return internal.NewAPIError("Erro ao enviar evento mesmo após diversas tentativas. "+err.Error(), 500, 200)
-		}
+	if err := transport.DialAndSend(msg); err != nil {
+		fmt.Println(err)
+		return err
 	}
 
 	return nil
