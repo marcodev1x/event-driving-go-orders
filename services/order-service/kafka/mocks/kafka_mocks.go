@@ -67,3 +67,17 @@ func (mr *MockEventProducerMockRecorder) PublishEvent(ctx, key, event any) *gomo
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PublishEvent", reflect.TypeOf((*MockEventProducer)(nil).PublishEvent), ctx, key, event)
 }
+
+// PublishEventAsync mocks base method.
+func (m *MockEventProducer) PublishEventAsync(ctx context.Context, key string, event any) <-chan error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PublishEventAsync", ctx, key, event)
+	ret0, _ := ret[0].(<-chan error)
+	return ret0
+}
+
+// PublishEventAsync indicates an expected call of PublishEventAsync.
+func (mr *MockEventProducerMockRecorder) PublishEventAsync(ctx, key, event any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PublishEventAsync", reflect.TypeOf((*MockEventProducer)(nil).PublishEventAsync), ctx, key, event)
+}

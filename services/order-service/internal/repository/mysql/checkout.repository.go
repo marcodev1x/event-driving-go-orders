@@ -15,15 +15,13 @@ func NewCheckoutRepository(db *gorm.DB) interfaces.CheckoutImplementation {
 	return &CheckoutRepository{db}
 }
 
-func (r *CheckoutRepository) CreateCheckout(checkout *domain.Checkout) (*domain.Checkout, error) {
-	var created *domain.Checkout
-
+func (r *CheckoutRepository) CreateCheckout(checkout *domain.Checkout) error {
 	if err := r.db.
 		Save(&checkout).
-		Find(&created).
+		Find(&checkout).
 		Error; err != nil {
-		return nil, err
+		return err
 	}
 
-	return created, nil
+	return nil
 }

@@ -3,31 +3,36 @@ package rest
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"order-service/infra/config"
 	"order-service/internal/usecases"
 	events "order-service/kafka/events/domain"
+	"sync"
 )
 
 // CheckoutConsumer implementa a interface kafka.EventHandler
 type CheckoutConsumer struct {
 	// adicionar dependências como repository, usecase, etc.
 	usecases *usecases.CheckoutUsecase
+
+	wg sync.WaitGroup
 }
 
-func NewCheckoutConsumer() *CheckoutConsumer {
-	return &CheckoutConsumer{}
+func NewCheckoutConsumer(usecase *usecases.CheckoutUsecase, maxConcurrentOps int) *CheckoutConsumer {
+	if maxConcurrentOps <= 0 {
+		maxConcurrentOps = 10
+	}
+
+	return &CheckoutConsumer{
+		usecases: usecase,
+	}
 }
 
 func (c *CheckoutConsumer) Handle(ctx context.Context, message []byte) error {
-
 	var event events.OrderCreated
 	if err := json.Unmarshal(message, &event); err != nil {
 		config.Logger().Error("Erro ao deserializar evento", err)
 		return err
 	}
-
-	fmt.Println(event.EventType)
 
 	// Processar o evento baseado no tipo
 	switch event.EventType {

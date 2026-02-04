@@ -78,7 +78,7 @@ func TestCheckoutUseCases_CreateCheckout(t *testing.T) {
 		})
 	}
 
-	t.Run("should throw ApiError if validate in structure fails", func(t *testing.T) {
+	t.Run("should throw ApiError repo registry fails", func(t *testing.T) {
 		controller := gomock.NewController(t)
 		defer controller.Finish()
 

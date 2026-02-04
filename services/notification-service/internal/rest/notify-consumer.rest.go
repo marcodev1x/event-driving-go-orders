@@ -26,8 +26,10 @@ func (c *CheckoutConsumer) Handle(ctx context.Context, message []byte) error {
 		return err
 	}
 
+	config.Logger().Info(event)
+
 	switch event.EventType {
-	case "order.created":
+	case "payment.valid":
 		return c.handleOrderCreated(ctx, event)
 	default:
 		config.Logger().Warnw("Tipo de evento desconhecido", "event_type", event.EventType)

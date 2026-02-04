@@ -6,7 +6,7 @@ import (
 	"order-service/internal"
 	"order-service/internal/domain"
 	kafkainterfaces "order-service/internal/interfaces/kafka"
-	interfaces "order-service/internal/repository/mysql/interfaces"
+	"order-service/internal/repository/mysql/interfaces"
 	"order-service/internal/structs"
 	redisinterfaces "order-service/internal/usecases/interfaces"
 	events "order-service/kafka/events/domain"
@@ -42,7 +42,7 @@ func (u *CheckoutUsecase) CreateCheckout(req structs.CreateCheckout) (bool, erro
 		PaymentMethod: req.PaymentMethod,
 	}
 
-	created, err := u.repository.CreateCheckout(checkout)
+	err := u.repository.CreateCheckout(checkout)
 
 	if err != nil {
 		return false, internal.NewAPIError("Erro ao criar checkout.", 500, 102)
@@ -52,30 +52,45 @@ func (u *CheckoutUsecase) CreateCheckout(req structs.CreateCheckout) (bool, erro
 		BaseEvent: events.BaseEvent{
 			EventID:   uuid.New().String(),
 			EventType: "order.created",
-			ContentID: created.ID,
+			ContentID: checkout.ID,
 			Timestamp: time.Now(),
 		},
 		Checkout: *checkout,
 	}
 
-	producerOperation := func() error {
-		return u.producer.PublishEvent(context.Background(), event.EventType, event)
-	}
-
-	go func() {
-		// backoff exponencial se falhar.
-		if err := producerOperation(); err != nil {
-			retry := backoff.NewExponentialBackOff()
-			retry.InitialInterval = 1 * time.Second
-			retry.MaxElapsedTime = 10 * time.Second
-			retry.MaxInterval = 5 * time.Second
-			retry.Multiplier = 2
-
-			if err := backoff.Retry(producerOperation, retry); err != nil {
-				config.Logger().Error("Erro ao publicar evento após retries.", err)
-			}
-		}
-	}()
+	go u.publishWithRetry(event)
 
 	return true, nil
+}
+
+func (u *CheckoutUsecase) publishWithRetry(event events.OrderCreated) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	operation := func() error {
+		return u.producer.PublishEvent(ctx, event.EventType, event)
+	}
+
+	// Configuração do retry exponencial
+	retry := backoff.NewExponentialBackOff()
+	retry.InitialInterval = 1 * time.Second
+	retry.MaxInterval = 10 * time.Second
+	retry.MaxElapsedTime = 30 * time.Second
+	retry.Multiplier = 2
+
+	if err := backoff.Retry(operation, retry); err != nil {
+		config.Logger().Errorw("Falha ao publicar evento após múltiplas tentativas",
+			"error", err,
+			"event_id", event.EventID,
+			"event_type", event.EventType,
+			"checkout_id", event.Checkout.ID,
+		)
+		return
+	}
+
+	config.Logger().Infow("Evento publicado com sucesso",
+		"event_id", event.EventID,
+		"event_type", event.EventType,
+		"checkout_id", event.Checkout.ID,
+	)
 }

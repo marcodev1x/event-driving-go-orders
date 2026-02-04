@@ -37,7 +37,7 @@ func CheckoutRoutes(env *config.Env) *[]internal.RouteHandler {
 				env.KafkaConfig.Broker,
 				"payment-events",
 				"order-payment-handler",
-				NewCheckoutConsumer(),
+				NewCheckoutConsumer(checkoutUseCase, 10),
 			)
 
 			return consumer.Start(context.Background())
@@ -60,7 +60,7 @@ func CheckoutRoutes(env *config.Env) *[]internal.RouteHandler {
 			Method:  internal.POST,
 			Middlewares: []gin.HandlerFunc{
 				middlewares.Interceptors.ErrorHandler(),
-				middlewares.Interceptors.RateLimiter(1, 1),
+				middlewares.Interceptors.RateLimiter(5, 10),
 			},
 		},
 	}

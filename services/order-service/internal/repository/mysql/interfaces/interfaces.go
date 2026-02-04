@@ -5,5 +5,5 @@ import (
 )
 
 type CheckoutImplementation interface {
-	CreateCheckout(checkout *domain.Checkout) (*domain.Checkout, error)
+	CreateCheckout(checkout *domain.Checkout) error
 }
