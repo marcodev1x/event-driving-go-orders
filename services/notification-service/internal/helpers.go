@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"notification-service/internal/domain"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,4 +34,21 @@ func BindJSON(ctx *gin.Context, dest any) error {
 	}
 
 	return nil
+}
+
+func HandlePaymentMethodToClient(method domain.PaymentMethod) string {
+	switch method {
+	case domain.Pix:
+		return "Pix"
+	case domain.Boleto:
+		return "Boleto"
+	case domain.CreditCard:
+		return "Cartão de Crédito"
+	case domain.DebitCard:
+		return "Cartão de Débito"
+	case domain.CommonMoney:
+		return "Dinheiro"
+	}
+
+	return "Método de pagamento não informado"
 }

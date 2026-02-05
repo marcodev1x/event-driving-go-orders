@@ -6,6 +6,36 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Olá, {{.Name}}</h1>
+    <div>
+        <h1
+            style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+            box-sizing: border-box;
+            font-size: 24px;
+            color: #222222;
+            margin: 0;"
+        >
+            Olá, {{.Name}}!
+        </h1>
+        <div>
+            <p
+                style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+                box-sizing: border-box;
+                font-size: 20px;
+                color: #222222;
+                margin-top: 20px;"
+            >
+                Obrigado por comprar conosco. Seu pagamento via {{.Method}} no valor de R$ {{.Price}} foi confirmado.
+            </p>
+            <p
+                style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+                box-sizing: border-box;
+                font-size: 20px;
+                color: #222222;
+                margin-top: 20px;"
+            >
+                Já notificamos o vendedor e seu produto deve ser enviado em breve.
+            </p>
+        </div>
+    </div>
 </body>
 </html>

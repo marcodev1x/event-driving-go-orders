@@ -37,16 +37,14 @@ func (u *NotifyUsecase) SendNotificationEmail(params events.NotificationInvoice,
 	}
 
 	Mailer := internal.NewMailer(internal.MailerContent{
-		To: struct {
-			Email string
-		}{
-			Email: email,
-		},
+		To:      email,
 		Subject: subject,
 	})
 
 	htmlParams := payment.PaymentAlert{
-		Name: params.Name,
+		Name:   params.Name,
+		Method: internal.HandlePaymentMethodToClient(params.PaymentMethod),
+		Price:  params.Price,
 	}
 
 	msg := Mailer.NewMessage()

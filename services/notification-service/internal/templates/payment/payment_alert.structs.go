@@ -1,5 +1,7 @@
 package payment
 
 type PaymentAlert struct {
-	Name string
+	Name   string
+	Method string
+	Price  float64
 }

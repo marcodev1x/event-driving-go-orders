@@ -17,9 +17,7 @@ type MailerImplementation interface {
 }
 
 type MailerContent struct {
-	To struct {
-		Email string
-	}
+	To      string
 	Subject string
 	Body    string
 }
@@ -51,7 +49,7 @@ func (m *Mailer) Dialer(envs *config.Env) *mail.Dialer {
 
 func (m *Mailer) MailPrepared(msg *mail.Message, envs *config.Env) {
 	msg.SetHeader("From", envs.SmtpConfig.EmailNoReply)
-	msg.SetHeader("To", m.content.To.Email)
+	msg.SetHeader("To", m.content.To)
 	msg.SetHeader("Subject", m.content.Subject)
 	msg.SetBody("text/html", m.content.Body)
 }

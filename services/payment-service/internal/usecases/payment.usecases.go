@@ -45,6 +45,7 @@ func (u *PaymentUsecase) ValidatePayment(params events.OrderCreated, orderId int
 		OrderID:       orderId,
 		BuyerEmail:    params.BuyerEmail,
 		PaymentMethod: params.Checkout.PaymentMethod,
+		Price:         params.Checkout.Price,
 	}
 
 	bf := backoff.NewExponentialBackOff()

@@ -25,4 +25,5 @@ type PaymentInvoice struct {
 	OrderID       int                  `json:"order_id"`
 	BuyerEmail    string               `json:"buyer_email"`
 	PaymentMethod domain.PaymentMethod `json:"payment_method"`
+	Price         float64              `json:"price"`
 }
