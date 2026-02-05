@@ -5,15 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ad9c79f2-588a-45be-b392-81308665c4d1" name="Changes" comment="feat: added first instance with gin + gorm, preparing architeture...">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/notification-service/internal/helpers.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification-service/internal/helpers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/notification-service/internal/mailer.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification-service/internal/mailer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/notification-service/internal/templates/payment/payment_alert.html" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification-service/internal/templates/payment/payment_alert.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/notification-service/internal/templates/payment/payment_alert.structs.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification-service/internal/templates/payment/payment_alert.structs.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/notification-service/internal/usecases/notify.usecases.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification-service/internal/usecases/notify.usecases.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/notification-service/kafka/events/domain/events.domain.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification-service/kafka/events/domain/events.domain.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/payment-service/internal/usecases/payment.usecases.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment-service/internal/usecases/payment.usecases.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/payment-service/kafka/events/domain/events.domain.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/payment-service/kafka/events/domain/events.domain.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/event-drivin-go-architecture.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,7 +66,7 @@
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "/home/marco/Área de trabalho/event-driving-go-orders/docs",
     "onboarding.tips.debug.path": "/home/marco/GolandProjects/awesomeProject/main.go",
-    "settings.editor.selected.configurable": "io.github.pandier.intellijdiscordrp.settings.DiscordSettingsConfigurable",
+    "settings.editor.selected.configurable": "ml.llm.LLMConfigurable",
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
