@@ -1,5 +1,7 @@
 # Sistema de Pedidos Event-Driven em Go
 
+<img width="3625" height="2221" alt="arch" src="docs/arch.png" />
+
 ## Visão Geral da Arquitetura
 
 Este projeto implementa uma arquitetura de microsserviços event-driven para processamento de pedidos utilizando Go, Kafka e MySQL. O sistema segue padrões de comunicação assíncrona para lidar com criação de pedidos, validação de pagamento e processos de negócio subsequentes.
