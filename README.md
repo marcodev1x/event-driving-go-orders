@@ -1,101 +1,122 @@
-# Sistema de Pedidos Event-Driven em Go
+# Event-Driven Order System in Go
 
 <img width="3625" height="2221" alt="arch" src="docs/arch.png" />
 
-## Visão Geral da Arquitetura
+## Architecture Overview
 
-Este projeto implementa uma arquitetura de microsserviços event-driven para processamento de pedidos utilizando Go, Kafka e MySQL. O sistema segue padrões de comunicação assíncrona para lidar com criação de pedidos, validação de pagamento e processos de negócio subsequentes.
+This project implements an event-driven microservices architecture for order processing using Go, Kafka, and MySQL.
 
-## Implementação Atual
+The system follows asynchronous communication patterns to handle order creation, payment validation, and subsequent business processes.
 
-### Serviços
+## Current Implementation
+
+### Services
 
 #### Order Service
-- **Porta**: 8080
-- **Database**: MySQL (banco de dados orders)
-- **Cache**: Redis
-- **Responsabilidades**:
-  - Gerencia criação de pedidos via endpoint `/create-checkout`
-  - Persiste pedidos com status "pendente pagamento"
-  - Publica eventos `order.created` no Kafka
-  - Consome eventos de confirmação de pagamento do Kafka
+
+* **Port**: 8080
+* **Database**: MySQL (`orders` database)
+* **Cache**: Redis
+* **Responsibilities**:
+
+  * Handles order creation through the `/create-checkout` endpoint
+  * Persists orders with a `pending payment` status
+  * Publishes `order.created` events to Kafka
+  * Consumes payment confirmation events from Kafka
 
 #### Payment Service
-- **Porta**: 8082
-- **Cache**: Redis
-- **Responsabilidades**:
-  - Consome eventos `order.created` do Kafka
-  - Realiza validação de pagamento
-  - Publica eventos de status de pagamento (`payment.confirmed` ou `payment.failed`) no Kafka
 
-### Fluxo de Eventos
+* **Port**: 8082
+* **Cache**: Redis
+* **Responsibilities**:
 
-1. **Criação do Pedido**
-   - Cliente envia requisição para `order-service/create-checkout`
-   - Pedido é salvo com status "pendente pagamento" no MySQL
-   - Evento `order.created` é publicado no Kafka
+  * Consumes `order.created` events from Kafka
+  * Performs payment validation
+  * Publishes payment status events (`payment.confirmed` or `payment.failed`) to Kafka
 
-2. **Processamento de Pagamento**
-   - `payment-service` consome evento `order.created`
-   - Validação de pagamento é executada
-   - Com base no resultado:
-     - Sucesso: evento `payment.confirmed` publicado
-     - Falha: evento `payment.failed` publicado
+## Event Flow
 
-3. **Atualização de Status do Pedido**
-   - `order-service` consome eventos de status de pagamento
-   - Status do pedido é atualizado no MySQL
-   - Pedidos com falha são marcados como "com falha"
+### 1. Order Creation
 
-## Componentes de Infraestrutura
+* The client sends a request to `order-service/create-checkout`
+* The order is persisted in MySQL with a `pending payment` status
+* An `order.created` event is published to Kafka
+
+### 2. Payment Processing
+
+* `payment-service` consumes the `order.created` event
+* Payment validation is performed
+* Based on the result:
+
+  * On success, a `payment.confirmed` event is published
+  * On failure, a `payment.failed` event is published
+
+### 3. Order Status Update
+
+* `order-service` consumes payment status events
+* The order status is updated in MySQL
+* Failed payments result in the order being marked as `failed`
+
+## Infrastructure Components
 
 ### Message Broker
-- **Kafka**: Plataforma de streaming de eventos para comunicação assíncrona
-- **Tópicos**:
-  - `order.created`: Acionado quando novos pedidos são criados
-  - `payment.confirmed`: Validação de pagamento bem-sucedida
-  - `payment.failed`: Falha na validação de pagamento
 
-### Bancos de Dados
-- **MySQL**: Armazenamento principal de informações de pedidos
-- **Redis**: Camada de cache para otimização de performance
+* **Kafka**: Event streaming platform used for asynchronous communication
+* **Topics**:
 
-### Ferramentas de Desenvolvimento
-- **Kafka UI**: Interface web para gerenciamento do Kafka (Porta 8081)
+  * `order.created`: Published when a new order is created
+  * `payment.confirmed`: Published after successful payment validation
+  * `payment.failed`: Published when payment validation fails
 
-## Melhorias Planejadas
+### Databases
+
+* **MySQL**: Primary storage for order information
+* **Redis**: Caching layer used to improve performance
+
+### Development Tools
+
+* **Kafka UI**: Web interface for managing and monitoring Kafka (Port 8081)
+
+## Planned Improvements
 
 ### Notify Service
-- **Propósito**: Sistema de notificação interna de compras
-- **Gatilho**: Consome eventos `payment.confirmed`
-- **Funcionalidade**: Enviar alertas internos para compras bem-sucedidas
+
+* **Purpose**: Internal purchase notification system
+* **Trigger**: Consumes `payment.confirmed` events
+* **Functionality**: Sends internal notifications for successful purchases
 
 ### Inventory Service
-- **Propósito**: Integração com gestão de estoque
-- **Gatilho**: Consome eventos `payment.confirmed`
-- **Funcionalidade**: 
-  - Recuperar informações de produto e estoque
-  - Reduzir níveis de inventário para pedidos confirmados
-  - Comunicar com microsserviço externo de estoque
 
-### Fluxo Futuro
-1. Após confirmação de pagamento:
-   - `notify-service` processa notificações internas de compra
-   - `inventory-service` gerencia redução de estoque
-   - Eventos adicionais podem ser publicados para atualizações de inventário
+* **Purpose**: Integration with inventory management
+* **Trigger**: Consumes `payment.confirmed` events
+* **Functionality**:
 
-## Especificações Técnicas
+  * Retrieves product and inventory information
+  * Decreases inventory levels for confirmed orders
+  * Communicates with an external inventory microservice
 
-### Stack Tecnológico
-- **Linguagem**: Go
-- **Web Framework**: Gin
-- **Message Queue**: Apache Kafka
-- **Database**: MySQL 8.0
-- **Cache**: Redis 8.2
-- **Containerização**: Docker & Docker Compose
+### Future Flow
 
-### Estrutura do Projeto
-```
+After a payment is confirmed:
+
+1. `notify-service` processes internal purchase notifications
+2. `inventory-service` handles inventory reduction
+3. Additional events can be published to propagate inventory updates
+
+## Technical Specifications
+
+### Technology Stack
+
+* **Language**: Go
+* **Web Framework**: Gin
+* **Message Queue**: Apache Kafka
+* **Database**: MySQL 8.0
+* **Cache**: Redis 8.2
+* **Containerization**: Docker & Docker Compose
+
+### Project Structure
+
+```text
 services/
 ├── order-service/
 │   ├── internal/
@@ -120,43 +141,51 @@ services/
     └── infra/
 ```
 
-### Configuração de Ambiente
-Cada serviço utiliza variáveis de ambiente para:
-- Conexões de banco de dados
-- Configuração do Redis
-- Configurações do broker Kafka
-- Parâmetros específicos do serviço
+## Environment Configuration
 
-### Endpoints da API
+Each service uses environment variables for:
 
-#### Order Service
-- `GET /create-checkout`: Cria novo checkout de pedido
+* Database connections
+* Redis configuration
+* Kafka broker configuration
+* Service-specific parameters
 
-#### Payment Service
-- Sem endpoints HTTP diretos (apenas event-driven)
+## API Endpoints
 
-## Configuração de Desenvolvimento
+### Order Service
 
-### Pré-requisitos
-- Docker & Docker Compose
-- Go 1.21+
+* `GET /create-checkout`: Creates a new order checkout
 
-### Executando a Aplicação
+### Payment Service
+
+* No direct HTTP endpoints — the service is fully event-driven
+
+## Development Setup
+
+### Prerequisites
+
+* Docker & Docker Compose
+* Go 1.21+
+
+### Running the Application
+
 ```bash
 docker-compose up -d
 ```
 
-Isso iniciará:
-- MySQL (Porta 3306)
-- Kafka (Porta 9092)
-- Kafka UI (Porta 8081)
-- Redis (Porta 6380)
-- Order Service (Porta 8080)
-- Payment Service (Porta 8082)
+This will start:
 
-## Schema de Eventos
+* MySQL (`3306`)
+* Kafka (`9092`)
+* Kafka UI (`8081`)
+* Redis (`6380`)
+* Order Service (`8080`)
+* Payment Service (`8082`)
 
-### Evento Order Created
+## Event Schemas
+
+### Order Created
+
 ```json
 {
   "event_id": "string",
@@ -171,7 +200,8 @@ Isso iniciará:
 }
 ```
 
-### Evento Payment Confirmed
+### Payment Confirmed
+
 ```json
 {
   "event_id": "string",
@@ -182,7 +212,8 @@ Isso iniciará:
 }
 ```
 
-### Evento Payment Failed
+### Payment Failed
+
 ```json
 {
   "event_id": "string",
@@ -193,26 +224,30 @@ Isso iniciará:
 }
 ```
 
-## Monitoramento e Observabilidade
+## Monitoring & Observability
 
 ### Logging
-- Logging estruturado com informações contextuais
-- Rastreamento de eventos com IDs de correlação
-- Logging de erros com stack traces
+
+* Structured logging with contextual information
+* Event tracking using correlation IDs
+* Error logging with stack traces
 
 ### Health Checks
-- Verificações de conectividade com banco de dados
-- Disponibilidade do broker Kafka
-- Validação de conexão Redis
 
-## Considerações de Escalabilidade
+* Database connectivity checks
+* Kafka broker availability
+* Redis connection validation
 
-### Configuração Kafka
-- Setup de broker único para desenvolvimento
-- Configurável para deployment multi-broker em produção
-- Criação automática de tópicos habilitada
+## Scalability Considerations
 
-### Escalabilidade de Serviços
-- Serviços stateless permitem escalonamento horizontal
-- Pool de conexões com banco de dados
-- Clustering Redis para alta disponibilidade
+### Kafka Configuration
+
+* Single-broker setup for development
+* Configurable for multi-broker deployments in production
+* Automatic topic creation enabled
+
+### Service Scalability
+
+* Stateless services allow horizontal scaling
+* Database connection pooling
+* Redis clustering for high availability
